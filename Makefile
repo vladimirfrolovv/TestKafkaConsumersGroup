@@ -1,4 +1,4 @@
-.PHONY: start stop
+.PHONY: start stop run clean
 
 all: start
 
@@ -21,3 +21,4 @@ stop:
 clean:
 	@docker image rm -f wurstmeister/zookeeper
 	@docker image rm -f wurstmeister/kafka
+	@rm output.txt

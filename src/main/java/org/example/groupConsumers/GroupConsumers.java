@@ -22,8 +22,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class GroupConsumers {
     private final static String TOPIC_NAME = "sequence";
     private static final String OUTPUT_FILE = "output.txt";
-    private static final int totalMsgToSend = 1000000;
-    private static final AtomicInteger sequence_counter = new AtomicInteger(0);
+    private static final int maxSequenceSize = 1000000;
+    private static final AtomicInteger sequenceCounter = new AtomicInteger(0);
     public static List<String> resultList = new ArrayList<>(Collections.nCopies(1000000, "1"));
 
     public static void run ( int consumerCount, String consumerGroups ) {
@@ -62,7 +62,7 @@ public class GroupConsumers {
                 ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(2));
 
                 for (ConsumerRecord<String, String> record : records) {
-                    sequence_counter.incrementAndGet();
+                    sequenceCounter.incrementAndGet();
                     String value = record.value();
                     int number = Integer.parseInt(value);
                     String result = FizzBuzz.fizzBuzz(number);
@@ -71,7 +71,7 @@ public class GroupConsumers {
 
                 consumer.commitSync();
 
-                if (sequence_counter.get() == totalMsgToSend) {
+                if (sequenceCounter.get() == maxSequenceSize) {
                     break;
                 }
             }
