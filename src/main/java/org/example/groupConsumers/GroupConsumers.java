@@ -1,4 +1,4 @@
-package org.example;
+package org.example.groupConsumers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -6,6 +6,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.example.configs.ConfigConsumer;
+import org.example.transformData.FizzBuzz;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -18,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
-public class GroupOfConsumers {
+public class GroupConsumers {
     private final static String TOPIC_NAME = "sequence";
     private static final String OUTPUT_FILE = "output.txt";
     private static final int totalMsgToSend = 1000000;
@@ -64,7 +65,7 @@ public class GroupOfConsumers {
                     sequence_counter.incrementAndGet();
                     String value = record.value();
                     int number = Integer.parseInt(value);
-                    String result = fizzBuzz(number);
+                    String result = FizzBuzz.fizzBuzz(number);
                     resultList.set(number - 1, result);
                 }
 
@@ -77,21 +78,5 @@ public class GroupOfConsumers {
         }
     }
 
-    public static String fizzBuzz ( int number ) {
-//        try {
-//            //271565
-//            Thread.sleep((Duration.ofNanos(1).toNanos()));
-//        } catch (InterruptedException e) {
-//            log.error(e.getMessage());
-//        }
-        if (number % 3 == 0 && number % 5 == 0) {
-            return "fizzbuzz";
-        } else if (number % 3 == 0) {
-            return "fizz";
-        } else if (number % 5 == 0) {
-            return "buzz";
-        } else {
-            return String.valueOf(number);
-        }
-    }
+
 }
