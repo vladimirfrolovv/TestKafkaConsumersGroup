@@ -34,11 +34,11 @@ public class GroupConsumers implements Closeable {
     private final String consumerGroups;
 
 
-    public GroupConsumers ( int consumersCount_, String consumerGroups_, Transformation transformation_ ) {
-        transformation = transformation_;
-        consumersCount = Math.min(consumersCount_, MAX_CONSUMERS);
-        executorService = Executors.newFixedThreadPool(consumersCount);
-        consumerGroups = consumerGroups_;
+    public GroupConsumers ( int consumersCount, String consumerGroups, Transformation transformation ) {
+        this.transformation = transformation;
+        this.consumersCount = Math.min(consumersCount, MAX_CONSUMERS);
+        this.executorService = Executors.newFixedThreadPool(consumersCount);
+        this.consumerGroups = consumerGroups;
     }
 
     public void run ( ) {
@@ -83,7 +83,7 @@ public class GroupConsumers implements Closeable {
         }
     }
 
-    public void writeDataToFile ( ) throws IOException {
+    public void writeDataToFile ( ) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(OUTPUT_FILE))) {
 
             for (String s : resultList) {
@@ -92,21 +92,20 @@ public class GroupConsumers implements Closeable {
                 writer.newLine();
             }
         } catch (IOException e) {
-            log.error("Dont write data", e);
-            throw new IOException();
+            throw new IllegalStateException("Dont write data", e);
         }
     }
 
     @Override
     public void close ( ) {
-        executorService.shutdown();
-
-        try {
-            executorService.awaitTermination(5, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            log.error("Thread pool interrupted", e);
-            Thread.currentThread().interrupt();
-
+        if (executorService != null) {
+            executorService.shutdown();
+            try {
+                executorService.awaitTermination(5, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                log.error("Thread pool interrupted", e);
+                Thread.currentThread().interrupt();
+            }
         }
     }
 }
